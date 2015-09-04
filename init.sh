@@ -26,12 +26,18 @@ LOCAL=192.168.1.0/24
 
 ##############
 # Find a rules
+if [ "${1}" = "help" ]
+then
+	echo -e "Usage: ./init.sh .. [cmd]\n"
+fi
+
 if [ "${1}" = "save" ]
 then
 	if [ -x /sbin/iptables-save ]
 	then
 		iptables_find
 		sh -c "iptables-save" 1>/dev/null
+		[ ${?} = 0 ] && echo -e "\e[1mNOTICE: \e[33mSave iptables\e[m"
 	else
 		exit 1
 	fi
