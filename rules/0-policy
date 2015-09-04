@@ -1,0 +1,19 @@
+#!/bin/bash
+
+iptables -F
+iptables -X
+iptables -Z
+
+iptables -t nat -F
+iptables -t nat -X
+iptables -t nat -Z
+
+iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT DROP
+
+iptables -t nat -P PREROUTING ACCEPT
+iptables -t nat -P INPUT ACCEPT
+iptables -t nat -P OUTPUT ACCEPT
+iptables -t nat -P POSTROUTING ACCEPT
+
