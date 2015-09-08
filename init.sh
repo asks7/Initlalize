@@ -1,15 +1,26 @@
-#!/usr/local/bin/bash
+#!/bin/bash
 
-[ -x /sbin/iptables ] || exit 1
-
-declare -i NUM=1
-
-if [ `id -u` != 0 ]
+if [ ! -x /sbin/iptables ]
 then
-	echo -e "\e[1mWarning: \e[31mRequest root user\e[m"
+	echo -e "\e[1mERROR: \e\31miptables is not installed\e[m"
 	exit 1
 fi
 
+if [ $(id -u) != 0 ]
+then
+	echo -e "\e[1mERROR: \e[31mRequest root user\e[m"
+	exit 1
+fi
+
+# Configure address and port
+LAN=192.168.1.1
+HOST=127.0.0.1
+HOME=192.168.1.254
+LOCAL=192.168.1.0/24
+
+declare -i NUM=1
+
+# Load functions.sh
 if [ -e ./functions.sh ]
 then
 	source ./functions.sh
@@ -17,34 +28,29 @@ else
 	exit 1
 fi
 
-############################
-# Configure address and port
-LAN=192.168.1.1
-HOST=127.0.0.1
-HOME=192.168.1.254
-LOCAL=192.168.1.0/24
-
-##############
 # Find a rules
-if [ "${1}" = "help" ]
-then
-	echo -e "Usage: ./init.sh .. [cmd]\n"
-fi
-
-if [ "${1}" = "save" ]
-then
-	if [ -x /sbin/iptables-save ]
-	then
+case "${1}" in
+	"save" )
+		if [ -x /sbin/ip6tables-save ]
+		then
+			iptables_find
+			sh -c "/sbin/ip6tables-save" 1>/dev/null
+			[ ${?} = 0 ] && echo -e "\e[1mNOTICE: \e[33mSave iptables\e[m"
+			exit 0
+		else
+			echo -e "\e[1mERROR: \e[32miptables-save is not installed\e[m"
+			exit 1
+		fi
+	;;
+	"debug" )
+		exit 0
+	;;
+	* )
+		export COLOR=true
 		iptables_find
-		sh -c "iptables-save" 1>/dev/null
-		[ ${?} = 0 ] && echo -e "\e[1mNOTICE: \e[33mSave iptables\e[m"
-	else
-		exit 1
-	fi
-else
-	export COLOR=true
-	iptables_find
-fi
+		exit 0
+	;;
+esac
 
-exit 0
+exit 1
 

@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#############
 # Set a rules
 if [ -d ./rules ]
 then
@@ -21,7 +20,6 @@ else
 	exit 1
 fi
 
-##############
 # Find a rules
 iptables_find () {
 	for RULE in ${FIND_RULE[@]}
